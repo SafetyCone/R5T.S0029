@@ -43,12 +43,12 @@ namespace R5T.S0029
 
         private async Task RunOperation()
         {
-        
+            await this.ServiceProvider.Run<O999_Scratch>();
         }
 
-        private async Task RunMethod()
-        {
+        //private async Task RunMethod()
+        //{
         
-        }
+        //}
     }
 }
