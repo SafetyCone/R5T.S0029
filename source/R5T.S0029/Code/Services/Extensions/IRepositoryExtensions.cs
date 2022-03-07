@@ -34,7 +34,7 @@ namespace R5T.S0029
             var hasExtensionMethodBase = await repository.HasExtensionMethodBaseForExtensionMethodBaseExtensions(
                 extensionMethodBaseExtensionIdentities);
 
-            if (!hasExtensionMethodBase.AnyNotFound())
+            if (hasExtensionMethodBase.AnyNotFound())
             {
                 throw new Exception("No extension method base found for some extension method base extension identities.");
             }
