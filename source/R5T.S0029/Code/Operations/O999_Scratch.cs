@@ -7,11 +7,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using R5T.Lombardy;
 
+using R5T.D0116;
 using R5T.T0020;
-using R5T.T0125.X0001;
 
 using R5T.S0029.Library;
-using R5T.S0029.X002;
 
 using LocalData;
 
@@ -30,14 +29,17 @@ namespace R5T.S0029
 
         private ICompilationUnitContextProvider CompilationUnitContextProvider { get; }
         private IStringlyTypedPathOperator StringlyTypedPathOperator { get; }
+        private IUsingDirectivesFormatter UsingDirectivesFormatter { get; }
 
 
         public O999_Scratch(
             ICompilationUnitContextProvider compilationUnitContextProvider,
-            IStringlyTypedPathOperator stringlyTypedPathOperator)
+            IStringlyTypedPathOperator stringlyTypedPathOperator,
+            IUsingDirectivesFormatter usingDirectivesFormatter)
         {
             this.CompilationUnitContextProvider = compilationUnitContextProvider;
             this.StringlyTypedPathOperator = stringlyTypedPathOperator;
+            this.UsingDirectivesFormatter = usingDirectivesFormatter;
         }
 
         public async Task Run()
@@ -137,162 +139,9 @@ namespace R5T.S0029
                         ;
 
                     // Get all usings.
-                    outputCompilationUnit = outputCompilationUnit.GetUsingsAnnotated(out var usingDirectivesAnnotated);
-
-                    if (usingDirectivesAnnotated.Any())
-                    {
-                        // There is at least one using.
-                        var usingNamespaceDirectivesAnnotated = usingDirectivesAnnotated.GetUsingNamespaceDirectives(outputCompilationUnit);
-
-                        // Sort using namespace directives.
-                        var usingNamespaceDirectiveBlockLabelProvider = new UsingNamespaceDirectiveBlockLabelProvider();
-
-                        var usingNamespaceDirectiveLabeledListsAnnotated = await usingNamespaceDirectiveBlockLabelProvider.GetUsingNamespaceDirectiveLabeledLists(
-                            usingNamespaceDirectivesAnnotated,
-                            namespaceName,
-                            outputCompilationUnit);
-
-                        var usingNamespaceDirectivesSortOrder = Instances.UsingDirectiveBlockSortOrder.RivetNamespaces();
-
-                        // Check can sort blocks.
-                        var anyNamespaceLabelsMissingFromSortOrder = Instances.Operation.AnyLabelsMissingFromSortOrder(
-                            usingNamespaceDirectiveLabeledListsAnnotated,
-                            usingNamespaceDirectivesSortOrder.BlockLabels);
-
-                        if (anyNamespaceLabelsMissingFromSortOrder)
-                        {
-                            throw new Exception("Labels were missing from the sort order.");
-                        }
-
-                        // Sort blocks.
-                        var orderedUsingNamespaceDirectiveLabeledListsAnnotated = Instances.Operation.OrderByLabels(
-                            usingNamespaceDirectiveLabeledListsAnnotated,
-                            usingNamespaceDirectivesSortOrder.BlockLabels);
-
-                        var usingNamespaceDirectiveComparerProvider = new UsingNamespaceDirectiveSyntaxComparerProvider();
-
-                        foreach (var labeledList in orderedUsingNamespaceDirectiveLabeledListsAnnotated)
-                        {
-                            var comparer = await usingNamespaceDirectiveComparerProvider.GetComparer(labeledList.Label);
-
-                            labeledList.Items.Sort((x, y) =>
-                            {
-                                var xUsingDirective = x.GetAnnotatedNode_Typed(outputCompilationUnit);
-                                var yUsingDirective = y.GetAnnotatedNode_Typed(outputCompilationUnit);
-
-                                var output = comparer.Compare(
-                                    UsingNamespaceDirectiveSyntax.From(xUsingDirective),
-                                    UsingNamespaceDirectiveSyntax.From(yUsingDirective));
-
-                                return output;
-                            });
-                        }
-
-                        // Using name alias directives.
-                        var usingNameAliasDirectivesAnnotated = usingDirectivesAnnotated.GetUsingNameAliasDirectives(outputCompilationUnit);
-
-                        var usingNameAliasBlockLabelProvider = new UsingNameAliasDirectiveBlockLabelProvider();
-
-                        var usingNameAliasDirectiveLabeledListsAnnotated = await usingNameAliasBlockLabelProvider.GetUsingNameAliasDirectiveLabeledLists(
-                            usingNameAliasDirectivesAnnotated,
-                            namespaceName,
-                            outputCompilationUnit);
-
-                        var usingNameAliasDirectivesSortOrder = Instances.UsingDirectiveBlockSortOrder.RivetNameAliases();
-
-                        // Check can sort blocks.
-                        var anyNameAliasLabelsMissingFromSortOrder = Instances.Operation.AnyLabelsMissingFromSortOrder(
-                            usingNameAliasDirectiveLabeledListsAnnotated,
-                            usingNameAliasDirectivesSortOrder.BlockLabels);
-
-                        if (anyNamespaceLabelsMissingFromSortOrder)
-                        {
-                            throw new Exception("Labels were missing from the sort order.");
-                        }
-
-                        // Sort blocks.
-                        var orderedUsingNameAliasDirectiveLabeledListsAnnotated = Instances.Operation.OrderByLabels(
-                            usingNameAliasDirectiveLabeledListsAnnotated,
-                            usingNameAliasDirectivesSortOrder.BlockLabels);
-
-                        var usingNameAliasDirectiveComparerProvider = new UsingNameAliasDirectiveSyntaxComparerProvider();
-
-                        foreach (var labeledList in usingNameAliasDirectiveLabeledListsAnnotated)
-                        {
-                            var comparer = await usingNameAliasDirectiveComparerProvider.GetComparer(labeledList.Label);
-
-                            labeledList.Items.Sort((x, y) =>
-                            {
-                                var xUsingDirective = x.GetAnnotatedNode_Typed(outputCompilationUnit);
-                                var yUsingDirective = y.GetAnnotatedNode_Typed(outputCompilationUnit);
-
-                                var output = comparer.Compare(
-                                    UsingNameAliasDirectiveSyntax.From(xUsingDirective),
-                                    UsingNameAliasDirectiveSyntax.From(yUsingDirective));
-
-                                return output;
-                            });
-                        }
-
-                        // Get back to a list of a common type annotation.
-                        var orderedUsingDirectiveBlocksAnnotated = orderedUsingNamespaceDirectiveLabeledListsAnnotated
-                            .Select(x => x.Items
-                                .Cast<UsingDirectiveAnnotation>()
-                                .ToArray())
-                            .AppendRange(orderedUsingNameAliasDirectiveLabeledListsAnnotated
-                                .Select(x => x.Items
-                                    .Cast<UsingDirectiveAnnotation>()
-                                    .ToArray()))
-                            .Now();
-
-                        // Get specific using directive annotations.
-                        var firstUsingOfFirstBlockAnnotation= orderedUsingDirectiveBlocksAnnotated.First().First();
-
-                        var firstUsingOfBlockAnnotations = orderedUsingDirectiveBlocksAnnotated.SkipFirst()
-                            .Select(x => x.First())
-                            .Now();
-
-                        var allOtherUsingAnnotations = orderedUsingDirectiveBlocksAnnotated
-                            .SelectMany(x => x.SkipFirst())
-                            .Now();
-
-                        // Set usings now so we can test for whether a using is the first syntax node in a file.
-                        // Now convert blocks back to an enumerable of usings.
-                        var orderedUsingDirectives = orderedUsingDirectiveBlocksAnnotated
-                            .SelectMany(x => x
-                                .Select(x => x.GetAnnotatedNode_Typed(outputCompilationUnit)))
-                            .Now();
-
-                        // Set usings.
-                        outputCompilationUnit = outputCompilationUnit.WithUsings(orderedUsingDirectives.ToSyntaxList());
-
-                        // Now modify spacings.
-                        var currentFirstUsingOfFirstBlock = outputCompilationUnit.GetAnnotatedNode_Typed(firstUsingOfFirstBlockAnnotation);
-
-                        var newFirstUsingOfFirstBlock = currentFirstUsingOfFirstBlock.EnsureFirstBlockFirstUsingDirectiveLeadingLines();
-
-                        outputCompilationUnit = outputCompilationUnit.ReplaceNode_Better(currentFirstUsingOfFirstBlock, newFirstUsingOfFirstBlock);
-
-                        foreach (var currentFirstUsingOfBlockAnnotation in firstUsingOfBlockAnnotations)
-                        {
-                            var currentFirstUsingOfBlock = outputCompilationUnit.GetAnnotatedNode_Typed(currentFirstUsingOfBlockAnnotation);
-
-                            var newFirstUsingOfBlock = currentFirstUsingOfBlock.EnsureBlockFirstUsingDirectiveLeadingLines();
-
-                            outputCompilationUnit = outputCompilationUnit.ReplaceNode_Better(currentFirstUsingOfBlock, newFirstUsingOfBlock);
-                        }
-
-                        foreach (var currentOtherUsingAnnotation in allOtherUsingAnnotations)
-                        {
-                            var currentOtherUsing = outputCompilationUnit.GetAnnotatedNode_Typed(currentOtherUsingAnnotation);
-
-                            var newOtherUsing = currentOtherUsing.EnsureBlockBodyDirectiveLeadingLines();
-
-                            outputCompilationUnit = outputCompilationUnit.ReplaceNode_Better(currentOtherUsing, newOtherUsing);
-                        }
-
-                        // Delete annotations.
-                    }
+                    outputCompilationUnit = await this.UsingDirectivesFormatter.FormatUsingDirectives(
+                        outputCompilationUnit,
+                        namespaceName);
 
                     return outputCompilationUnit;
                 },

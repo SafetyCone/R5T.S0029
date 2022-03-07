@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using R5T.D0116;
@@ -12,7 +13,7 @@ using LocalData;
 namespace R5T.S0029
 {
     [OperationMarker]
-    public class O001_AddExtensionMethodBaseFunctionalityToProject : IActionOperation
+    public class O001a_AddExtensionMethodBaseFunctionalitiesToProject : IOperation
     {
         private ICompilationUnitContextProvider CompilationUnitContextProvider { get; }
         private IRepository Repository { get; }
@@ -20,7 +21,7 @@ namespace R5T.S0029
         private AddProjectReferencesToProject AddProjectReferencesToProject { get; }
 
 
-        public O001_AddExtensionMethodBaseFunctionalityToProject(
+        public O001a_AddExtensionMethodBaseFunctionalitiesToProject(
             ICompilationUnitContextProvider compilationUnitContextProvider,
             IRepository repository,
             IUsingDirectivesFormatter usingDirectivesFormatter,
@@ -33,44 +34,38 @@ namespace R5T.S0029
             this.AddProjectReferencesToProject = addProjectReferencesToProject;
         }
 
-        public async Task Run()
+        public async Task Run(
+            string projectFilePath,
+            string localInstancesClassNamespaceName,
+            string[] extensionMethodBaseIdentityStrings)
         {
-            // Inputs.
-            var projectFilePath = @"C:\Code\DEV\Git\GitHub\SafetyCone\Test\source\TestProject\TestProject.csproj";
-
-            var extensionMethodBaseIdentityString = Instances.ExtensionMethodBaseFunctionality.IAnsiColorCode_BlackBackground_R5T_T0089_X001();
-
-            var namespaceName = Instances.ProjectPathsOperator.GetDefaultProjectNamespaceName(projectFilePath);
-
-
-            // Run.
-
             // Get the identity Guid for the identity string.
-            var extensionMethodBaseIdentity = Instances.GuidOperator.FromStringStandard(extensionMethodBaseIdentityString);
+            var extensionMethodBaseIdentities = Instances.GuidOperator.FromStringsStandard(extensionMethodBaseIdentityStrings);
 
             // Get the extension method base type for the extension method base functionality.
-            var extensionMethodBase = await this.Repository.GetExtensionMethodBaseForExtensionMethodBaseExtension(extensionMethodBaseIdentity);
+            var extensionMethodBases = await this.Repository.GetExtensionMethodBaseForExtensionMethodBaseExtensions(extensionMethodBaseIdentities);
 
             // Get the project for the extension method base functionality.
-            var projectReferenceIdentity = await this.Repository.ExtensionMethodBaseExtensionRepository
-                .GetProjectIdentityForExtensionMethodBaseExtension(extensionMethodBaseIdentity);
+            var projectReferenceIdentitiesByExtensionMethodBaseIdentity = await this.Repository.ExtensionMethodBaseExtensionRepository
+                .GetProjectIdentitiesForExtensionMethodBaseExtensions(extensionMethodBaseIdentities);
+
+            var projectReferenceIdentities = projectReferenceIdentitiesByExtensionMethodBaseIdentity
+                .Select(x => x.Value)
+                ;
 
             // Add the project reference to the target project using Olympia functionality (add project reference to target project, and all recursive project references to solution of target project).
             await this.AddProjectReferencesToProject.Run(
                 projectFilePath,
-                projectReferenceIdentity);
+                projectReferenceIdentities);
 
             // Add the extension method base type to the Instances class of the target project.
-            var extensionMethodBaseInterfaceNamespacedTypeName = extensionMethodBase.NamespacedTypeName;
-
-            var extensionMethodBaseInterfaceNamespacedTypeNames = new[]
-            {
-                extensionMethodBaseInterfaceNamespacedTypeName,
-            };
+            var extensionMethodBaseInterfaceNamespacedTypeNames = extensionMethodBases
+                .Select(x => x.NamespacedTypeName)
+                ;
 
             await this.CompilationUnitContextProvider.AddExtensionMethodBasesToProjectInstances(
                 projectFilePath,
-                namespaceName,
+                localInstancesClassNamespaceName,
                 extensionMethodBaseInterfaceNamespacedTypeNames,
                 this.UsingDirectivesFormatter);
 

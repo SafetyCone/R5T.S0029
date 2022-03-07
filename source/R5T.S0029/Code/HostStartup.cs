@@ -21,9 +21,10 @@ using R5T.D0108.I0001;
 using R5T.D0108.I001;
 using R5T.D0109.I0001;
 using R5T.D0109.I001;
+using R5T.D0116.A0001;
+using R5T.D0117.I001;
+using R5T.O0002;
 using R5T.T0063;
-
-using R5T.S0029.Library;
 
 using IProvidedServiceActionAggregation = R5T.D0088.I0002.IProvidedServiceActionAggregation;
 using IRequiredServiceActionAggregation = R5T.D0088.I0002.IRequiredServiceActionAggregation;
@@ -114,26 +115,52 @@ namespace R5T.S0029
                 servicesPlatform.StringlyTypedPathOperatorAction);
 
             // Services.
+            // Level 00.
+            var usingDirectivesFormatterActions = Instances.ServiceAction.AddUsingDirectivesFormatterActions();
+            
             // Level 01.
             var compilationUnitContextProviderAction = Instances.ServiceAction.AddCompilationUnitContextProviderAction(
-                projectRepositoryAction,
                 servicesPlatform.StringlyTypedPathOperatorAction,
                 visualStudioProjectFileOperatorActions.VisualStudioProjectFileOperatorAction,
                 visualStudioProjectFileReferencesProviderAction,
                 visualStudioSolutionFileOperatorActions.VisualStudioSolutionFileOperatorAction);
 
             // Operations-Dependencies.
+            var addProjectReferencesToProjectAction = Instances.ServiceAction.AddAddProjectReferencesToProjectAction(
+                projectRepositoryAction,
+                servicesPlatform.StringlyTypedPathOperatorAction,
+                visualStudioProjectFileOperatorActions.VisualStudioProjectFileOperatorAction,
+                visualStudioProjectFileReferencesProviderAction,
+                visualStudioSolutionFileOperatorActions.VisualStudioSolutionFileOperatorAction);
 
             // Operations.
+            // Level 01
+            var o001_AddExtensionMethodBaseFunctionalityToProjectAction = Instances.ServiceAction.AddO001_AddExtensionMethodBaseFunctionalityToProjectAction(
+                compilationUnitContextProviderAction,
+                repositoryAction,
+                usingDirectivesFormatterActions.UsingDirectivesFormatterAction,
+                addProjectReferencesToProjectAction);
+            var o001a_AddExtensionMethodBaseFunctionalitiesToProjectAction = Instances.ServiceAction.AddO001a_AddExtensionMethodBaseFunctionalitiesToProjectAction(
+                compilationUnitContextProviderAction,
+                repositoryAction,
+                usingDirectivesFormatterActions.UsingDirectivesFormatterAction,
+                addProjectReferencesToProjectAction);
             var o999_ScratchAction = Instances.ServiceAction.AddO999_ScratchAction(
                 compilationUnitContextProviderAction,
-                servicesPlatform.StringlyTypedPathOperatorAction);
+                servicesPlatform.StringlyTypedPathOperatorAction,
+                usingDirectivesFormatterActions.UsingDirectivesFormatterAction);
+
+            // Level 02.
+            var o000_MainAction = Instances.ServiceAction.AddO000_MainAction(
+                o001a_AddExtensionMethodBaseFunctionalitiesToProjectAction);
 
             // Run.
             services.MarkAsServiceCollectonConfigurationStatement()
                 .Run(servicesPlatform.ConfigurationAuditSerializerAction)
                 .Run(servicesPlatform.ServiceCollectionAuditSerializerAction)
                 //Operations.
+                .Run(o000_MainAction)
+                .Run(o001_AddExtensionMethodBaseFunctionalityToProjectAction)
                 .Run(o999_ScratchAction)
                 ;
             

@@ -2,6 +2,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\LocalData\source\LocalData\LocalData.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0116.A0001\source\R5T.D0116.A0001\R5T.D0116.A0001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0117\source\R5T.D0117.I001\R5T.D0117.I001.csproj" />
+    <ProjectReference Include="..\..\..\R5T.D0117\source\R5T.D0117.X001\R5T.D0117.X001.csproj" />
     <ProjectReference Include="..\..\..\R5T.Magyar\source\R5T.Magyar\R5T.Magyar.csproj" />
     <ProjectReference Include="..\..\..\R5T.D0088\source\R5T.D0088.X001\R5T.D0088.X001.csproj" />
     <ProjectReference Include="..\..\..\R5T.D0088.I0002\source\R5T.D0088.I0002\R5T.D0088.I0002.csproj" />

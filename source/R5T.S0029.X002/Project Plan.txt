@@ -1,3 +1,0 @@
-R5T.S0029.X002 - Strongly-typed annotations.
-
-GOALS:
