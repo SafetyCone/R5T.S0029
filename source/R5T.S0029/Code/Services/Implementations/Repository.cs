@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 
 using R5T.D0101;
 using R5T.D0108;
-using R5T.D0109;
+using R5T.D0109;using R5T.T0064;
 
 
 namespace R5T.S0029
-{
-    public class Repository : IRepository
+{[ServiceImplementationMarker]
+    public class Repository : IRepository,IServiceImplementation
     {
         public IExtensionMethodBaseExtensionRepository ExtensionMethodBaseExtensionRepository { get; private set; }
         public IExtensionMethodBaseRepository ExtensionMethodBaseRepository { get; private set; }
