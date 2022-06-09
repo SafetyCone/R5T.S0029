@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\LocalData\source\LocalData\LocalData.csproj" />
     <ProjectReference Include="..\..\..\R5T.D0116.A0001\source\R5T.D0116.A0001\R5T.D0116.A0001.csproj" />
@@ -33,10 +32,10 @@
     <ProjectReference Include="..\..\..\R5T.X0002\source\R5T.X0002\R5T.X0002.csproj" />
     <ProjectReference Include="..\..\..\R5T.T0064\source\R5T.T0064\R5T.T0064.csproj" />
   </ItemGroup>
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591;1573</NoWarn>
   </PropertyGroup>
-
 </Project>
