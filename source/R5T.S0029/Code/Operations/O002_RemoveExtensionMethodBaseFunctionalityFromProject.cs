@@ -15,7 +15,9 @@ namespace R5T.S0029
         {
             // Inputs.
             var projectFilePath = @"C:\Code\DEV\Git\GitHub\SafetyCone\Test\source\Test\Test.csproj";
-            var extensionMethodBaseFunctionalityIdentityString = Instances.ExtensionMethodBaseFunctionality.IAnsiColorCode_BlackBackground_R5T_T0089_X001();
+            var extensionMethodBaseFunctionalityIdentityString =
+                //Instances.ExtensionMethodBaseFunctionality.IAnsiColorCode_BlackBackground_R5T_T0089_X001();
+                "";
 
             // Run.
 

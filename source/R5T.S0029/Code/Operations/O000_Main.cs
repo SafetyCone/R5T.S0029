@@ -29,7 +29,8 @@ namespace R5T.S0029
             var extensionMethodBaseIdentityStrings =
                 new[]
                 {
-                    Instances.ExtensionMethodBaseFunctionality.INamespacedTypeNameOperator_GetTypeName_R5T_B0003_X001(),
+                    ""
+                    //Instances.ExtensionMethodBaseFunctionality.INamespacedTypeNameOperator_GetTypeName_R5T_B0003_X001(),
                 };
                 // Testing
                 //new[]

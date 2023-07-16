@@ -38,7 +38,9 @@ namespace R5T.S0029
             // Inputs.
             var projectFilePath = @"C:\Code\DEV\Git\GitHub\SafetyCone\Test\source\TestProject\TestProject.csproj";
 
-            var extensionMethodBaseIdentityString = Instances.ExtensionMethodBaseFunctionality.IAnsiColorCode_BlackBackground_R5T_T0089_X001();
+            var extensionMethodBaseIdentityString =
+                //Instances.ExtensionMethodBaseFunctionality.IAnsiColorCode_BlackBackground_R5T_T0089_X001();
+                "";
 
             var namespaceName = Instances.ProjectPathsOperator.GetDefaultProjectNamespaceName(projectFilePath);
 
